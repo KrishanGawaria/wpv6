@@ -1,0 +1,9 @@
+<h1>Followings Page</h1>
+
+<%User.followings.forEach(function(singleUser){%>
+    <p><%=singleUser.name%></p>
+    <form action = "/user/<%=currentUser._id%>/unfollow/<%=singleUser._id%>/?_method=PUT" method='POST'>
+        <button>Unfollow</button>
+    </form>
+    <hr>
+<%})%>

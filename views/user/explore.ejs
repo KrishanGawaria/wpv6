@@ -1,0 +1,33 @@
+<h1>Explore Page</h1>
+<p><%=currentUser%></p>
+<%var flag = 0%>
+
+<%Users.forEach(function(User){%>
+    <%// Below is logic to check if foundUser is current user, then don't display it on explore page%>
+    <%if(!currentUser._id.equals(User._id)){%>
+        <div><%=User.name%></div>
+        <div><%=User.username%></div>
+        <%
+            // Below is logic to check if the displayed user is in the following list of 
+            // current user of not. Accordingly display "follow" or "unfollow" button.
+            currentUser.followings.forEach(function(following){
+                //console.log("Following Id: "+typeof following._id + " User id: "+typeof User._id) // Both are object
+                if(following._id.equals(User._id)){ // OR vice-vera is also true. Two objects can't be compared by == operator
+                    flag = 1
+                }
+            })
+            
+            if(flag == 0){%>
+                <form action = "/user/<%=currentUser._id%>/follow/<%=User._id%>/?_method=PUT" method='POST'>
+                    <button>Follow</button>
+                </form>
+            <%} else {%>
+                <form action = "/user/<%=currentUser._id%>/unfollow/<%=User._id%>/?_method=PUT" method='POST'>
+                    <button>Unfollow</button>
+                </form>
+            <%}
+            flag = 0
+        %>
+        <hr>
+    <%}%>
+<%})%>

@@ -1,0 +1,16 @@
+<h1>Register Page</h1>
+
+<%if(error && error.length>0){%>
+    <p><%=error%></p>
+<%}%>
+
+<%if(success && success.length>0){%>
+    <p><%=success%></p>
+<%}%>
+
+<form action = '/register' method = 'POST'>
+    <input type= 'text' placeholder= 'Name' name= 'name'>
+    <input type= 'text' placeholder= 'Username' name= 'username'>
+    <input type= 'password' placeholder= 'Password' name= 'password'>
+    <input type='submit'>
+</form>

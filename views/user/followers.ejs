@@ -1,0 +1,27 @@
+<h1>Followers Page</h1>
+
+<% var flag = 0 %>
+
+<%User.followers.forEach(function(followerUser){%>
+    <p><%=followerUser.name%></p>
+    
+    <%User.followings.forEach(function(followingUser){
+        if(followingUser._id.equals(followerUser._id)){
+            flag = 1
+        }
+    })
+    
+    if(flag == 0){  %>
+        <form action = "/user/<%=currentUser._id%>/follow/<%=followerUser._id%>/?_method=PUT" method='POST'>
+            <button>Follow</button>
+        </form>
+    <%} else {  %>
+        <form action = "/user/<%=currentUser._id%>/unfollow/<%=followerUser._id%>/?_method=PUT" method='POST'>
+            <button>Unfollow</button>
+        </form>
+    <%}
+    
+    flag = 0
+    %>
+    <hr>
+<%})%>
