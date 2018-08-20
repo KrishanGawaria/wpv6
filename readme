@@ -3,3 +3,4 @@
         
 In this version (v3) following changes are made:
     1. user, post and comment models are modified.
+    2. team routes and team views are created

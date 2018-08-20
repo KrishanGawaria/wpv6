@@ -35,6 +35,8 @@ router.post("/", function(req, res){
         .then(function(foundUser){
             createdTeam.users.push(foundUser)
             createdTeam.save()
+            foundUser.teams.push(createdTeam)
+            foundUser.save()
             res.redirect(previousURL)  
         })
         .catch(function(error){
