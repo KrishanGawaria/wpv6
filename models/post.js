@@ -16,6 +16,10 @@ var postSchema = new mongoose.Schema({
         
         username : {
             type : String
+        },
+        
+        name : {
+            type : String
         }
     }, 
     

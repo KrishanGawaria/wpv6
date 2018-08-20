@@ -1,0 +1,5 @@
+<h1>All Teams</h1>
+
+<%Teams.forEach(function(Team){%>
+    <p><a href="/user/<%=currentUser._id%>"/teams/<%=Team._id%>>Team.name</a></p>
+<%})%>

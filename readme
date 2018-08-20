@@ -1,2 +1,5 @@
 1.  The prevous url from which the request to present route has come is stored in :
         req.headers.referer
+        
+In this version (v3) following changes are made:
+    1. user, post and comment models are modified.

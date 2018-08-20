@@ -12,7 +12,8 @@ var express                 =   require('express')                  ,
     User                    =   models.User                         ,
     
     indexRoutes             =   require('./routes/index')           ,
-    userRoutes              =   require('./routes/user')             
+    userRoutes              =   require('./routes/user')            ,
+    teamRoutes              =   require("./routes/team")
     
     
 
@@ -45,6 +46,7 @@ app.use(function(req, res, next){
 
 app.use('/', indexRoutes)
 app.use('/user/:user_id', userRoutes)
+app.use('/user/:user_id/teams', teamRoutes)
 
 app.listen(process.env.PORT, process.env.IP, function(){
     console.log("Server Started ...")
