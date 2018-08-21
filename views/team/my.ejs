@@ -1,5 +1,7 @@
 <h1>My Teams</h1>
 
+<p><a href="/user/<%=currentUser._id%>/teams/new">Create New Team</a></p>
+
 <%User.teams.forEach(function(Team){%>
     <p><a href="/user/<%=currentUser._id%>/teams/<%=Team._id%>"><%=Team.name%></a></p>
 <%})%>

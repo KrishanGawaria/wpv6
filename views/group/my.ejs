@@ -1,0 +1,7 @@
+<h1>My Groups</h1>
+
+<p><a href="/user/<%=currentUser._id%>/groups/new">Create New Group</a></p>
+
+<%User.groups.forEach(function(Group){%>
+    <p><a href="/user/<%=currentUser._id%>/groups/<%=Group._id%>"><%=Group.name%></a></p>
+<%})%>

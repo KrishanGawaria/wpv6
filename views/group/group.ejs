@@ -1,0 +1,12 @@
+<h1><%=Group%></h1>
+
+<!--Leave Group-->
+<form action="/user/<%=currentUser._id%>/groups/<%=Group._id%>/leaveuser/?_method=PUT" method="POST">
+    <button>Leave Group</button>
+</form>
+
+<form action="/user/<%=currentUser._id%>/groups/<%=Group._id%>/adduser/?_method=PUT" method="POST">
+    <label for="username">Add Members to Group</label>
+    <input type="text" id="username" name="username" placeholder="Enter username">
+    <button>Add</button>
+</form>

@@ -1,1 +1,13 @@
 <h1><%=Team%></h1>
+
+<!--Leave Team-->
+<form action="/user/<%=currentUser._id%>/teams/<%=Team._id%>/leaveuser/?_method=PUT" method="POST">
+    <button>Leave Team</button>
+</form>
+
+<!--Add User to Team-->
+<form action="/user/<%=currentUser._id%>/teams/<%=Team._id%>/adduser/?_method=PUT" method="POST">
+    <label for="username">Add Members to Team</label>
+    <input type="text" id="username" name="username" placeholder="Enter username">
+    <button>Add</button>
+</form>
