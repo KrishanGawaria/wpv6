@@ -2,9 +2,7 @@
         req.headers.referer
         
 In this version (v3) following changes are made:
-    1. user, post and comment models are modified.
-    2. team routes and team views are created
-    3. group routes and group views are created
-    4. "add user(by username) to group" route is created: user/:user_id/goups/:goup_id/user
-    5. Create "Leave Group" functionality
-    6. Create "Leave Team" functionality
+    1. post routes and explore routes are created.
+    2. post views and explore views are created.
+    3. explore routes and explore views are for stalking other user.
+    

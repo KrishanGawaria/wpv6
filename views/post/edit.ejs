@@ -1,0 +1,6 @@
+<h1>Edit Post</h1>
+
+<form action="/user/<%=currentUser._id%>/posts/<%=Post._id%>/?_method=PUT" method='POST'>
+    <input type="text" name="body" value="<%=Post.body%>">
+    <button>Submit</button>
+</form>

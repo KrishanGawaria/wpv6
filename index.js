@@ -14,7 +14,9 @@ var express                 =   require('express')                  ,
     indexRoutes             =   require('./routes/index')           ,
     userRoutes              =   require('./routes/user')            ,
     teamRoutes              =   require("./routes/team")            ,
-    groupRoutes             =   require("./routes/group")
+    groupRoutes             =   require("./routes/group")           ,
+    postRoutes              =   require("./routes/post")            ,
+    exploreRoutes           =   require("./routes/explore")
     
     
 
@@ -49,6 +51,8 @@ app.use('/', indexRoutes)
 app.use('/user/:user_id', userRoutes)
 app.use('/user/:user_id/teams', teamRoutes)
 app.use('/user/:user_id/groups', groupRoutes)
+app.use('/user/:user_id/posts', postRoutes)
+app.use('/user/:user_id/explore', exploreRoutes)
 
 app.listen(process.env.PORT, process.env.IP, function(){
     console.log("Server Started ...")

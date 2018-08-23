@@ -1,12 +1,11 @@
 <h1>Explore Page</h1>
-<p><%=currentUser%></p>
+
 <%var flag = 0%>
 
 <%Users.forEach(function(User){%>
     <%// Below is logic to check if foundUser is current user, then don't display it on explore page%>
     <%if(!currentUser._id.equals(User._id)){%>
-        <div><%=User.name%></div>
-        <div><%=User.username%></div>
+        <div><a href="/user/<%=currentUser._id%>/explore/<%=User._id%>"><%=User.name%> (<%=User.username%>)</a></div>
         <%
             // Below is logic to check if the displayed user is in the following list of 
             // current user of not. Accordingly display "follow" or "unfollow" button.

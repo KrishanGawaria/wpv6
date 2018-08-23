@@ -1,0 +1,24 @@
+<h1>You are stalking <%=User.name%></h1>
+
+<p><a href="/user/<%=currentUser._id%>/explore/<%=User._id%>/profile">Profile</a></p>
+<p><a href="/user/<%=currentUser._id%>/explore/<%=User._id%>/followers">Followers</a></p>
+<p><a href="/user/<%=currentUser._id%>/explore/<%=User._id%>/followings">Followings</a></p>
+<p><a href="/user/<%=currentUser._id%>/explore/<%=User._id%>/teams">His Teams</a></p>
+
+
+<!--Displaying posts here-->
+<%User.posts.forEach(function(foundPost){%>
+    <div><%=foundPost.body%></div>
+    <div>By: <%=foundPost.author.name%> (<%=foundPost.author.username%>)</div>
+    <%if(foundPost.author.username == User.username){%>
+        <form action="/user/<%=currentUser._id%>/posts/<%=foundPost._id%>/?_method=DELETE" method='POST'>
+            <button>Delete</button>
+        </form>
+        <form action="/user/<%=currentUser._id%>/posts/<%=foundPost._id%>/edit" method='GET'>
+            <button>Edit</button>
+        </form>
+    <%}%>
+    <hr>
+<%})%>
+
+

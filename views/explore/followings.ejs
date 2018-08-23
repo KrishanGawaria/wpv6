@@ -1,0 +1,31 @@
+<h1>Followings Page of <%=User.name%></h1>
+
+<% var flag = 0 %>
+
+<%User.followings.forEach(function(followingUser){%>
+    <p><%=followingUser.name%></p>
+    <%if(currentUser._id.equals(followingUser._id)){
+        flag = -1   // User's following user is the current user (Don't display follow/unfollow button)
+    }%>
+    
+    <!--currentUser's followings have not been populated. So currentUser.followings is an array of User ids-->
+    <%currentUser.followings.forEach(function(followingUserId){
+        if(followingUserId.equals(followingUser._id)){
+            flag = 1
+        }
+    })
+    
+    if(flag == 0){  %>
+        <form action = "/user/<%=currentUser._id%>/follow/<%=followingUser._id%>/?_method=PUT" method='POST'>
+            <button>Follow</button>
+        </form>
+    <%} else if(flag==1) {  %>
+        <form action = "/user/<%=currentUser._id%>/unfollow/<%=followingUser._id%>/?_method=PUT" method='POST'>
+            <button>Unfollow</button>
+        </form>
+    <%}
+    
+    flag = 0
+    %>
+    <hr>
+<%})%>

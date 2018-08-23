@@ -6,7 +6,15 @@ var express         =   require('express')  ,
     helperFunctions =   require("../helper_functions")
     
 router.get("/", function(req, res){
-    res.render("user/index")
+    var previousURL = helperFunctions.previousURL(req.headers.referer)
+    User.findOne({_id : req.user._id}).populate("posts")
+    .then(function(foundUser){
+        res.render("user/index", {User: foundUser})
+    })
+    .catch(function(error){
+        console.log("Error")
+        res.redirect(previousURL)
+    })
 })
 
 
@@ -37,23 +45,6 @@ router.get("/followings", function(req, res){
     
 })
 
-
-// Explore
-router.get("/explore", function(req, res){
-    
-    var previousURL = helperFunctions.previousURL(req.headers.referer)  
-    // req.headers.referer contains the full path of previous url e.g. https://domain.com/users/1234
-    // Now previousURL is : /users/1234
-    
-    User.find({}).
-    then(function(foundUsers){
-        res.render("user/explore", {Users : foundUsers})
-    })
-    .catch(function(error){
-        console.log("Error")
-        res.redirect(previousURL)
-    })
-})
 
 
 // Logic to Follow User
@@ -90,7 +81,7 @@ router.put('/unfollow/:unfollow_user_id', function(req, res){
     .then(function(foundUser){
         User.findOne({_id : req.params.unfollow_user_id})
         .then(function(unfollowUser){
-            var i=0
+            var i=-1
             foundUser.followings.forEach(function(followingUser, index){
                 if(unfollowUser._id.equals(followingUser._id)){
                     i = index
@@ -99,7 +90,7 @@ router.put('/unfollow/:unfollow_user_id', function(req, res){
             foundUser.followings.splice(i, i+1) // :unfollow_user_id(unfollowUser) is at index i, and deleting it from followings of current user(foundUser)
             foundUser.save()
             
-            i= 0
+            i= -1
             unfollowUser.followers.forEach(function(followerUser, index){
                 if(foundUser._id.equals(followerUser._id)){
                     i = index
@@ -120,5 +111,8 @@ router.put('/unfollow/:unfollow_user_id', function(req, res){
         res.redirect(previousURL)
     })
 })
+
+
+
 
 module.exports = router

@@ -1,0 +1,5 @@
+<h1>Teams of <%=User.name%></h1>
+
+<%User.teams.forEach(function(Team){%>
+    <p><a href="/user/<%=currentUser._id%>/teams/<%=Team._id%>"><%=Team.name%></a></p>
+<%})%>

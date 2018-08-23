@@ -51,8 +51,10 @@ router.post("/", function(req, res){
 
 router.get("/my", function(req, res){
     var previousURL = helperFunctions.previousURL(req.headers.referer)
+
     User.findOne({_id : req.user._id}).populate("teams")
     .then(function(foundUser){
+        console.log("foundUser: "+foundUser)
         res.render("team/my", {User : foundUser})
     })
     .catch(function(error){
@@ -62,7 +64,8 @@ router.get("/my", function(req, res){
 
 router.get("/:team_id", function(req, res){
     var previousURL = helperFunctions.previousURL(req.headers.referer)
-    Team.findOne({_id : req.params.team_id})
+
+    Team.findOne({_id : req.params.team_id}).populate("posts").populate("users")
     .then(function(foundTeam){
         res.render("team/team", {Team: foundTeam})
     })
@@ -102,17 +105,18 @@ router.put("/:team_id/leaveuser", function(req, res){
         User.findOne({_id : req.user._id})
         .then(function(foundUser){
             // Removing the user from team
-            var i = 0
+            var i = -1
             foundTeam.users.forEach(function(memberUser, index){
                 if(memberUser._id.equals(foundUser._id)){
                     i = index
                 }
             })
+            
             foundTeam.users.splice(i, i+1)
             foundTeam.save()
             
             // Removing team from the user
-            i=0
+            i=-1
             foundUser.teams.forEach(function(memberTeam, index){
                 if(memberTeam._id.equals(foundTeam._id)){
                     i = index
@@ -123,11 +127,13 @@ router.put("/:team_id/leaveuser", function(req, res){
             res.redirect(previousURL)
         })
         .catch(function(error){
-             res.redirect(previousURL)
+            console.log("Error")
+            res.redirect(previousURL)
         })
     })
     .catch(function(error){
-         res.redirect(previousURL)
+        console.log("Error")    
+        res.redirect(previousURL)
     })
 })
 module.exports = router

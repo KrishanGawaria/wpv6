@@ -89,7 +89,7 @@ router.put("/:group_id/leaveuser", function(req, res){
         User.findOne({_id : req.user._id})
         .then(function(foundUser){
             // Removing the user from group
-            var i = 0
+            var i = -1
             foundGroup.users.forEach(function(memberUser, index){
                 if(memberUser._id.equals(foundUser._id)){
                     i = index
@@ -99,7 +99,7 @@ router.put("/:group_id/leaveuser", function(req, res){
             foundGroup.save()
             
             // Removing group from the user
-            i=0
+            i=-1
             foundUser.groups.forEach(function(memberGroup, index){
                 if(memberGroup._id.equals(foundGroup._id)){
                     i = index
