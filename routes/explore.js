@@ -28,9 +28,15 @@ router.get("/", function(req, res){
 // Explore a Specific user
 router.get("/:explore_user_id", function(req, res){
     var previousURL = helperFunctions.previousURL(req.headers.referer)
-    User.findOne({_id : req.params.explore_user_id}).populate("posts")
-    .then(function(foundUser){
-        res.render("explore/index", {User : foundUser})
+    Post.find({authorId : req.params.explore_user_id}).sort({created : -1})
+    .then(function(foundPosts){
+        User.findOne({_id : req.params.explore_user_id})
+        .then(function(foundUser){
+            res.render("explore/index", {Posts : foundPosts, User : foundUser})
+        })
+        .catch(function(error){
+            res.redirect(previousURL)  
+        })
     })
     .catch(function(error){
         console.log("Error")

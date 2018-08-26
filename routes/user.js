@@ -3,16 +3,52 @@ var express         =   require('express')  ,
     
     models          =   require("../models"),  
     User            =   models.User         ,
+    Post            =   models.Post         ,
     helperFunctions =   require("../helper_functions")
     
 router.get("/", function(req, res){
     var previousURL = helperFunctions.previousURL(req.headers.referer)
-    User.findOne({_id : req.user._id}).populate("posts")
-    .then(function(foundUser){
-        res.render("user/index", {User: foundUser})
+    
+    var AllPosts = []
+    var startDate = helperFunctions.startDate() // contains the date 2 days before
+    
+    Post.find({authorId : req.user._id, teamId: null, groupId: null, created: {$gte : startDate}}).sort({created : -1}).limit(10)
+    // above line finds at most 10 posts with given authorId and which were created before 2 days or after; and exclude 
+        //      the posts of teams and groups. created: -1 means to sort the posts by descending order of created.
+        //      To sort by ascending order, make the created value to be 1. 
+        //      $gte : startDate means greater than startDate
+    .then(function(foundPosts){
+        foundPosts.forEach(function(foundPost){
+            AllPosts.push(foundPost)
+        })
+        User.findOne({_id : req.user._id}).populate("followings")
+        .then(function(foundUser){
+            
+            foundUser.followings.forEach(function(followingUser, index){
+                Post.find({authorId : followingUser._id, teamId: null, groupId: null, created : {$gte: startDate}}).sort({created : -1}).limit(10)
+                .then(function(foundPosts){
+                    foundPosts.forEach(function(foundPost){
+                        AllPosts.push(foundPost)
+                    })
+                    if((index+1) == foundUser.followings.length){
+                        // Sorting the AllPosts array by date
+                        AllPosts = helperFunctions.sortPostsByDate(AllPosts)
+                        res.render("user/index", {Posts: AllPosts})
+                    }
+                })
+                .catch(function(error){
+                    res.redirect(previousURL)
+                })
+            })
+
+        })
+        .catch(function(error){
+            res.redirect(previousURL)
+        })
+        
     })
     .catch(function(error){
-        console.log("Error")
+        console.log(error)
         res.redirect(previousURL)
     })
 })

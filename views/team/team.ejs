@@ -31,11 +31,12 @@
         <button>Submit Post</button>
     </form>
     
+    
     <!--Displaying posts here-->
-    <%Team.posts.forEach(function(foundPost){%>
+    <%SortedPosts.forEach(function(foundPost){%>
         <div><%=foundPost.body%></div>
-        <div>By: <%=foundPost.author.name%> (<%=foundPost.author.username%>)</div>
-        <%if(foundPost.author.username == currentUser.username){%>
+        <div>By: <%=foundPost.authorName%> (<%=foundPost.authorUsername%>)</div>
+        <%if(foundPost.authorUsername == currentUser.username){%>
             <form action="/user/<%=currentUser._id%>/posts/<%=foundPost._id%>/?_method=DELETE" method='POST'>
                 <button>Delete</button>
             </form>

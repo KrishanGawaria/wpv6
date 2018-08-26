@@ -11,7 +11,10 @@ var express         =   require('express')              ,
 router.post("/", function(req, res){
     var previousURL = helperFunctions.previousURL(req.headers.referer)
     var newPost = {
-        body : req.body.body
+        body : req.body.body,
+        authorId: req.user._id,
+        authorUsername : req.user.username,
+        authorName : req.user.name
     }
     Post.create(newPost)
     .then(function(createdPost){
@@ -19,11 +22,7 @@ router.post("/", function(req, res){
         .then(function(foundUser){
             foundUser.posts.push(createdPost)
             foundUser.save()
-            
-            createdPost.author.id = foundUser
-            createdPost.author.username = foundUser.username
-            createdPost.author.name = foundUser.name
-            createdPost.save()
+
             res.redirect(previousURL)
         })
         .catch(function(error){
@@ -87,15 +86,18 @@ router.delete("/:post_id", function(req, res){
 router.post("/team/:team_id", function(req, res){
     var previousURL = helperFunctions.previousURL(req.headers.referer)
     var newPost = {
-        body : req.body.body
+        body : req.body.body,
+        authorId: req.user._id,
+        authorUsername : req.user.username,
+        authorName : req.user.name,
     }
+    
     Post.create(newPost)
     .then(function(createdPost){
         Team.findOne({_id : req.params.team_id})
         .then(function(foundTeam){
-            createdPost.author.id = req.user
-            createdPost.author.username = req.user.username
-            createdPost.author.name = req.user.name
+            // Assigning tead id to the post
+            createdPost.teamId = foundTeam._id
             createdPost.save()
             foundTeam.posts.push(createdPost)
             foundTeam.save()

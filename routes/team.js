@@ -4,6 +4,7 @@ var express         =   require("express")              ,
     models          =   require("../models")            ,
     Team            =   models.Team                     ,
     User            =   models.User                     ,
+    Post            =   models.Post                     ,
     helperFunctions =   require("../helper_functions")  
     
     
@@ -64,10 +65,18 @@ router.get("/my", function(req, res){
 
 router.get("/:team_id", function(req, res){
     var previousURL = helperFunctions.previousURL(req.headers.referer)
-
-    Team.findOne({_id : req.params.team_id}).populate("posts").populate("users")
+    var startDate = helperFunctions.startDate()
+    
+    Team.findOne({_id : req.params.team_id}).populate("users")
     .then(function(foundTeam){
-        res.render("team/team", {Team: foundTeam})
+        Post.find({teamId : req.params.team_id, created : {$gte : startDate}}).sort({created : -1}).limit(20)
+        //  The at most 20 posts which were created after (before 2 days) and sorted by descending oreder of created
+        .then(function(SortedPosts){
+            res.render("team/team", {Team: foundTeam, SortedPosts : SortedPosts})  
+        })
+        .catch(function(error){
+            res.redirect(previousURL)
+        })
     })
     .catch(function(error){
         res.redirect(previousURL)

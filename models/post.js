@@ -1,6 +1,8 @@
 var mongoose    =   require('mongoose') ,
     User        =   require("./user")   ,
-    Comment     =   require("./comment")
+    Comment     =   require("./comment"),
+    Team        =   require("./team")   ,
+    Group       =   require("./group")
 
 var postSchema = new mongoose.Schema({
     
@@ -8,20 +10,34 @@ var postSchema = new mongoose.Schema({
         type : String
     }, 
     
-    author : {
-        id : {
-            type : mongoose.Schema.Types.ObjectId,
-            ref : "User"
-        },
+    created : {
+        type: Date,
+        default : Date.now
+    },
+    
+    authorId : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref : "User"
+    },
         
-        username : {
-            type : String
-        },
+    authorUsername : {
+        type : String
+    },
         
-        name : {
-            type : String
-        }
+    authorName : {
+        type : String
+    },
+    
+    teamId : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref : "Team"
     }, 
+    
+    groupId : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref : "Group"
+    },
+    
     
     comments : [
         {

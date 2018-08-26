@@ -13,7 +13,7 @@ var models = {
     Comment :   Comment
 }
 
-mongoose.connect("mongodb://localhost/wpv3", { useNewUrlParser: true })
+mongoose.connect("mongodb://localhost/wpv5", { useNewUrlParser: true })
 // mongoose.set('debug', true)
 mongoose.Promise = Promise
 
