@@ -1,103 +1,107 @@
-In this version (v5) following changes have been made:
+In this version (v6) following changes are made:
 
-* models/user has been modified into:
-    authorName, authorId, authorUsername, teamId, groupId have been added into user model.
-    And so logic to create post for user, team and group are modified accordingly.
-    
-* startDate helperFunction is added : 
-    helperFunctions.startDate = function(){
-        var startDate = new Date() // current date
-        startDate.setDate(startDate.getDate()-2)    // subtracting 2 days from current date
-        startDate.setHours(0)
-        startDate.setMinutes(0)
-        startDate.setSeconds(0)
-        return startDate
-    }
-    
-* sortPostsByDate helperFunction is added:
-    helperFunctions.sortPostsByDate = function(Posts){
-        Posts = Posts.sort(function(b,a){   // if a,b is passed, it would sort into ascending order
-            return a.created - b.created
-        })
-        return Posts
-        
-        // Explanation: 
-        //     Assume, Posts = [{'data': 'k', created: 25.6.18}, {'data': 'a', created: 26.6.18}]
-        //     It would return Posts = [{'data': 'a', created: 26.6.18}, {'data': 'k', created: 25.6.18}]
-        //     It sorted the array by descending order of created
-        
-    }
-    
-* routes/user is modified: router.get('/)
-    Now user's and his followings posts are visible on the timeline filtered by most recent posts of previous
-    2 days and a limit of 10 posts per user
-    
-    router.get("/", function(req, res){
-        var previousURL = helperFunctions.previousURL(req.headers.referer)
-        
-        var AllPosts = []
-        var startDate = helperFunctions.startDate() // contains the date 2 days before
-        
-        Post.find({authorId : req.user._id, teamId: null, groupId: null, created: {$gte : startDate}}).sort({created : -1}).limit(10)
-        // above line finds at most 10 posts with given authorId and which were created before 2 days or after; and exclude 
-        //      the posts of teams and groups. created: -1 means to sort the posts by descending order of created.
-        //      To sort by ascending order, make the created value to be 1 
-        //      $gte : startDate means greater than startDate
-        .then(function(foundPosts){
-            foundPosts.forEach(function(foundPost){
-                AllPosts.push(foundPost)
-            })
-            User.findOne({_id : req.user._id}).populate("followings")
-            .then(function(foundUser){
-                
-                foundUser.followings.forEach(function(followingUser, index){
-                    Post.find({authorId : followingUser._id, teamId: null, groupId: null, created : {$gte: startDate}}).sort({created : -1}).limit(10)
-                    .then(function(foundPosts){
-                        foundPosts.forEach(function(foundPost){
-                            AllPosts.push(foundPost)
-                        })
-                        if((index+1) == foundUser.followings.length){
-                            // Sorting the AllPosts array by date
-                            AllPosts = helperFunctions.sortPostsByDate(AllPosts)
-                            res.render("user/index", {Posts: AllPosts})
-                        }
-                    })
-                    .catch(function(error){
-                        res.redirect(previousURL)
-                    })
-                })
-    
-            })
-            .catch(function(error){
-                res.redirect(previousURL)
-            })
+*   routes/post.js : A new route to create post for group 
+
+        // Logic to create group post:
+        router.post('/group/:group_id', function(req, res){
+            var previousURL = helperFunctions.previousURL(req.headers.referer)
+            var newPost = {
+                body : req.body.body,
+                authorId : req.user._id,
+                authorName : req.user.name,
+                authorUsername : req.user.username
+            }
             
+            Post.create(newPost)
+            .then(function(createdPost){
+                Group.findOne({_id : req.params.group_id})
+                .then(function(foundGroup){
+                    createdPost.groupId = foundGroup._id
+                    createdPost.save()
+                    foundGroup.posts.push(createdPost)
+                    foundGroup.save()
+                    res.redirect(previousURL)
+                })
+                .catch(function(error){
+                    console.log("Error")
+                    res.redirect(previousURL)
+                })
+            })
+            .catch(function(error){
+                console.log("Error")
+                res.redirect(previousURL)
+            })
         })
-        .catch(function(error){
-            console.log(error)
-            res.redirect(previousURL)
-        })
-    })
-    
-* routes/team modified : Displaying posts of particular team
-    router.get("/:team_id", function(req, res){
-        var previousURL = helperFunctions.previousURL(req.headers.referer)
-        var startDate = helperFunctions.startDate()
-        
-        Team.findOne({_id : req.params.team_id}).populate("users")
-        .then(function(foundTeam){
-            Post.find({teamId : req.params.team_id, created : {$gte : startDate}}).sort({created : -1}).limit(20)
-            //  The at most 20 posts which were created after (before 2 days) and sorted by descending oreder of created
-            .then(function(SortedPosts){
-                res.render("team/team", {Team: foundTeam, SortedPosts : SortedPosts})  
+
+
+*   routes/group.js : Logic to extract filtered group posts and render group/group
+
+        router.get("/:group_id", function(req, res){
+            var previousURL = helperFunctions.previousURL(req.headers.referer)
+            var startDate = helperFunctions.startDate()
+            Group.findOne({_id : req.params.group_id}).populate("users")
+            .then(function(foundGroup){
+                Post.find({groupId : req.params.group_id, created : {$gte : startDate}}).sort({created : -1}).limit(20)
+                .then(function(SortedPosts){
+                    res.render("group/group", {Group: foundGroup, SortedPosts: SortedPosts})
+                })
+                .catch(function(error){
+                    
+                })
             })
             .catch(function(error){
                 res.redirect(previousURL)
             })
         })
-        .catch(function(error){
-            res.redirect(previousURL)
+
+
+
+*   views/group/group : Display form for creating 'group post' and Display posts
+
+        <!--Displaying form to create post-->
+        <form action="/user/<%=currentUser._id%>/posts/group/<%=Group._id%>" method="POST">
+            <label for="post">Create New Post</label>
+            <input type="text" name="body" id="post" placeholder="Enter post">
+            <button>Submit</button>
+        </form>
+        
+        
+        <!--Displaying posts here-->
+        <%SortedPosts.forEach(function(foundPost){%>
+            <div><%=foundPost.body%></div>
+            <div>By: <%=foundPost.authorName%> (<%=foundPost.authorUsername%>)</div>
+            <%if(foundPost.authorUsername == currentUser.username){%>
+                <form action="/user/<%=currentUser._id%>/posts/<%=foundPost._id%>/?_method=DELETE" method='POST'>
+                    <button>Delete</button>
+                </form>
+                <form action="/user/<%=currentUser._id%>/posts/<%=foundPost._id%>/edit" method='GET'>
+                    <button>Edit</button>
+                </form>
+            <%}%>
+            <hr>
+        <%})%>
+        
+        
+*   routes/explore : filtered posts of explored user:
+
+        // Explore a Specific user
+        router.get("/:explore_user_id", function(req, res){
+            var previousURL = helperFunctions.previousURL(req.headers.referer)
+            Post.find({authorId : req.params.explore_user_id, groupId : null, teamId : null}).sort({created : -1})
+            // We don't want posts of team or group
+            .then(function(foundPosts){
+                User.findOne({_id : req.params.explore_user_id})
+                .then(function(foundUser){
+                    res.render("explore/index", {Posts : foundPosts, User : foundUser})
+                })
+                .catch(function(error){
+                    res.redirect(previousURL)  
+                })
+            })
+            .catch(function(error){
+                console.log("Error")
+                res.redirect(previousURL)
+            })
         })
-    })
-    
-* views/partials are added
+
+        

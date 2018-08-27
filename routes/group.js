@@ -4,6 +4,7 @@ var express         =   require("express")              ,
     models          =   require("../models")            ,
     Group           =   models.Group                    ,
     User            =   models.User                     ,
+    Post            =   models.Post                     ,
     helperFunctions =   require("../helper_functions")  
     
     
@@ -50,9 +51,16 @@ router.get("/my", function(req, res){
 
 router.get("/:group_id", function(req, res){
     var previousURL = helperFunctions.previousURL(req.headers.referer)
-    Group.findOne({_id : req.params.group_id})
+    var startDate = helperFunctions.startDate()
+    Group.findOne({_id : req.params.group_id}).populate("users")
     .then(function(foundGroup){
-        res.render("group/group", {Group: foundGroup})
+        Post.find({groupId : req.params.group_id, created : {$gte : startDate}}).sort({created : -1}).limit(20)
+        .then(function(SortedPosts){
+            res.render("group/group", {Group: foundGroup, SortedPosts: SortedPosts})
+        })
+        .catch(function(error){
+            
+        })
     })
     .catch(function(error){
         res.redirect(previousURL)

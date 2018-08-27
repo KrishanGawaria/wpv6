@@ -28,7 +28,8 @@ router.get("/", function(req, res){
 // Explore a Specific user
 router.get("/:explore_user_id", function(req, res){
     var previousURL = helperFunctions.previousURL(req.headers.referer)
-    Post.find({authorId : req.params.explore_user_id}).sort({created : -1})
+    Post.find({authorId : req.params.explore_user_id, groupId : null, teamId : null}).sort({created : -1})
+    // We don't want posts of team or group
     .then(function(foundPosts){
         User.findOne({_id : req.params.explore_user_id})
         .then(function(foundUser){

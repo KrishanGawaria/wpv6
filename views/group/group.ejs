@@ -1,12 +1,52 @@
 <h1><%=Group%></h1>
 
-<!--Leave Group-->
-<form action="/user/<%=currentUser._id%>/groups/<%=Group._id%>/leaveuser/?_method=PUT" method="POST">
-    <button>Leave Group</button>
-</form>
+<!--Checking whether currentUser is member of group or not-->
+<%var memberOfGroup = false%>
+<%Group.users.forEach(function(singleUser){
+    if(singleUser._id.equals(currentUser._id)){
+        memberOfGroup = true
+    }
+})%>
 
-<form action="/user/<%=currentUser._id%>/groups/<%=Group._id%>/adduser/?_method=PUT" method="POST">
-    <label for="username">Add Members to Group</label>
-    <input type="text" id="username" name="username" placeholder="Enter username">
-    <button>Add</button>
-</form>
+<!--Displaying Members of Group-->
+<%Group.users.forEach(function(singleUser){%>
+    <div><%=singleUser.name%> : (<%=singleUser.username%>)</div>
+<%})%>
+
+
+<%if(memberOfGroup){%>
+    <!--Leave Group-->
+    <form action="/user/<%=currentUser._id%>/groups/<%=Group._id%>/leaveuser/?_method=PUT" method="POST">
+        <button>Leave Group</button>
+    </form>
+    
+    <!--Displaying form to add user-->
+    <form action="/user/<%=currentUser._id%>/groups/<%=Group._id%>/adduser/?_method=PUT" method="POST">
+        <label for="username">Add Members to Group</label>
+        <input type="text" id="username" name="username" placeholder="Enter username">
+        <button>Add</button>
+    </form>
+    
+    <!--Displaying form to create post-->
+    <form action="/user/<%=currentUser._id%>/posts/group/<%=Group._id%>" method="POST">
+        <label for="post">Create New Post</label>
+        <input type="text" name="body" id="post" placeholder="Enter post">
+        <button>Submit</button>
+    </form>
+    
+    
+    <!--Displaying posts here-->
+    <%SortedPosts.forEach(function(foundPost){%>
+        <div><%=foundPost.body%></div>
+        <div>By: <%=foundPost.authorName%> (<%=foundPost.authorUsername%>)</div>
+        <%if(foundPost.authorUsername == currentUser.username){%>
+            <form action="/user/<%=currentUser._id%>/posts/<%=foundPost._id%>/?_method=DELETE" method='POST'>
+                <button>Delete</button>
+            </form>
+            <form action="/user/<%=currentUser._id%>/posts/<%=foundPost._id%>/edit" method='GET'>
+                <button>Edit</button>
+            </form>
+        <%}%>
+        <hr>
+    <%})%>
+<%}%>

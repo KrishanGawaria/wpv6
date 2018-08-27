@@ -5,6 +5,7 @@ var express         =   require('express')              ,
     User            =   models.User                     ,
     Post            =   models.Post                     ,
     Team            =   models.Team                     ,
+    Group           =   models.Group                    ,
     helperFunctions =   require("../helper_functions")
 
 // Creating a new post And append it to user    
@@ -107,6 +108,38 @@ router.post("/team/:team_id", function(req, res){
             console.log("Error")
             res.redirect(previousURL)
         })
+    })
+})
+
+
+// Logic to create group post:
+router.post('/group/:group_id', function(req, res){
+    var previousURL = helperFunctions.previousURL(req.headers.referer)
+    var newPost = {
+        body : req.body.body,
+        authorId : req.user._id,
+        authorName : req.user.name,
+        authorUsername : req.user.username
+    }
+    
+    Post.create(newPost)
+    .then(function(createdPost){
+        Group.findOne({_id : req.params.group_id})
+        .then(function(foundGroup){
+            createdPost.groupId = foundGroup._id
+            createdPost.save()
+            foundGroup.posts.push(createdPost)
+            foundGroup.save()
+            res.redirect(previousURL)
+        })
+        .catch(function(error){
+            console.log("Error")
+            res.redirect(previousURL)
+        })
+    })
+    .catch(function(error){
+        console.log("Error")
+        res.redirect(previousURL)
     })
 })
 
